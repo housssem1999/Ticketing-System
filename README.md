@@ -1,6 +1,7 @@
 # Ticketing System Design Blueprint
 
 This repository documents a production-grade ticketing platform architecture for high-demand events.
+The app is intended to be developed using the Spring Boot framework.
 
 ## 1) Business Domain
 
