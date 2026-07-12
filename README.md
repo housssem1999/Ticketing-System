@@ -249,6 +249,29 @@ Example independent scaling:
 | RTO | < 15 min |
 | RPO | < 1 min |
 
+## 26) Epic A Implementation Artifacts
+
+- **Schema + constraints + lifecycle guards + rules engine**: `/db/schema.sql`
+- **Transition/rule tests (PostgreSQL SQL script)**: `/db/state_machine_and_rules_tests.sql`
+
+### ERD (Core entities and relationships)
+
+```mermaid
+erDiagram
+    venues ||--o{ venue_sections : has
+    venue_sections ||--o{ venue_rows : has
+    venue_rows ||--o{ venue_seats : has
+    venues ||--o{ events : hosts
+    events ||--o{ tickets : offers
+    venue_seats ||--o{ tickets : maps_to
+    events ||--o{ reservations : receives
+    reservations ||--|{ reservation_items : contains
+    tickets ||--o{ reservation_items : selected_by
+    reservations ||--|| orders : creates
+    orders ||--o{ payments : settles
+    audit_logs }o--|| events : tracks
+```
+
 ## End-to-End Production Flow
 
 `Waiting room → slot assignment → auth → validate event/sale window → validate limits → seat map → seat selection → distributed lock → reservation (TTL) → payment session → trusted webhook → confirm reservation → issue ticket → signed QR generation → audit log → publish events → notify user → release lock`
