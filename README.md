@@ -249,6 +249,49 @@ Example independent scaling:
 | RTO | < 15 min |
 | RPO | < 1 min |
 
+## 26) Epic A Implementation Artifacts
+
+- **Schema + constraints + lifecycle guards + rules engine**: `/db/schema.sql`
+- **Transition/rule tests (PostgreSQL SQL script)**: `/db/state_machine_and_rules_tests.sql`
+
+### ERD (Core entities and relationships)
+
+```mermaid
+erDiagram
+    venues ||--o{ venue_sections : has
+    venue_sections ||--o{ venue_rows : has
+    venue_rows ||--o{ venue_seats : has
+    venues ||--o{ events : hosts
+    events ||--o{ tickets : offers
+    venue_seats ||--o{ tickets : maps_to
+    events ||--o{ reservations : receives
+    reservations ||--|{ reservation_items : contains
+    tickets ||--o{ reservation_items : selected_by
+    reservations ||--|| orders : creates
+    orders ||--o{ payments : settles
+    audit_logs }o--|| events : tracks
+```
+
+## 27) Spring Boot Application Setup
+
+The repository now includes a runnable Spring Boot service that maps the SQL model:
+
+- Main app: `/src/main/java/com/ticketing/system/TicketingSystemApplication.java`
+- Domain entities/enums: `/src/main/java/com/ticketing/system/domain`
+- Flyway migration for the model: `/src/main/resources/db/migration/V1__core_domain.sql`
+- App config: `/src/main/resources/application.yml`
+- Local PostgreSQL runner: `/docker-compose.yml`
+
+### Run locally
+
+1. Start PostgreSQL:
+   - `docker compose up -d`
+2. Run the Spring Boot app:
+   - `./mvnw spring-boot:run`
+   - or `mvn spring-boot:run`
+
+On startup, Flyway applies the SQL model migration automatically.
+
 ## End-to-End Production Flow
 
 `Waiting room → slot assignment → auth → validate event/sale window → validate limits → seat map → seat selection → distributed lock → reservation (TTL) → payment session → trusted webhook → confirm reservation → issue ticket → signed QR generation → audit log → publish events → notify user → release lock`
