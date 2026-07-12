@@ -272,6 +272,26 @@ erDiagram
     audit_logs }o--|| events : tracks
 ```
 
+## 27) Spring Boot Application Setup
+
+The repository now includes a runnable Spring Boot service that maps the SQL model:
+
+- Main app: `/src/main/java/com/ticketing/system/TicketingSystemApplication.java`
+- Domain entities/enums: `/src/main/java/com/ticketing/system/domain`
+- Flyway migration for the model: `/src/main/resources/db/migration/V1__core_domain.sql`
+- App config: `/src/main/resources/application.yml`
+- Local PostgreSQL runner: `/docker-compose.yml`
+
+### Run locally
+
+1. Start PostgreSQL:
+   - `docker compose up -d`
+2. Run the Spring Boot app:
+   - `./mvnw spring-boot:run`
+   - or `mvn spring-boot:run`
+
+On startup, Flyway applies the SQL model migration automatically.
+
 ## End-to-End Production Flow
 
 `Waiting room → slot assignment → auth → validate event/sale window → validate limits → seat map → seat selection → distributed lock → reservation (TTL) → payment session → trusted webhook → confirm reservation → issue ticket → signed QR generation → audit log → publish events → notify user → release lock`
